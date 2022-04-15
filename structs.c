@@ -1,6 +1,6 @@
+/*
 #include <stdio.h>
 #define DI 3 // dimension of the cube
-#define FACES 6
 
 #define FRONT 0
 #define LEFT 1
@@ -16,7 +16,18 @@
 #define WHITE 4
 #define YELLOW 5
 
-char COLORS[FACES] = {'G', 'O', 'R', 'B', 'W', 'Y'};
+char COLORS[6] = {'G', 'O', 'R', 'B', 'W', 'Y'};
+
+typedef struct
+{
+    int frontFace[DI][DI];
+    int leftFace[DI][DI];
+    int rightFace[DI][DI];
+    int backFace[DI][DI];
+    int topFace[DI][DI];
+    int bottomFace[DI][DI];
+
+} Cube;
 
 void setFace(int face[][DI], int value)
 {
@@ -44,6 +55,66 @@ void showFace(int face[][DI])
     return;
 }
 
+void showFrontFace(Cube cube)
+{
+    printf("frontFace\n");
+    showFace(cube.frontFace);
+    return;
+}
+
+void showLeftFace(Cube cube)
+{
+    printf("leftFace\n");
+    showFace(cube.leftFace);
+    return;
+}
+
+void showRightFace(Cube cube)
+{
+    printf("rightFace\n");
+    showFace(cube.rightFace);
+    return;
+}
+
+void showBackFace(Cube cube)
+{
+    printf("backFace\n");
+    showFace(cube.backFace);
+    return;
+}
+
+void showTopFace(Cube cube)
+{
+    printf("topFace\n");
+    showFace(cube.topFace);
+    return;
+}
+
+void showBottomFace(Cube cube)
+{
+    printf("bottomFace\n");
+    showFace(cube.bottomFace);
+    return;
+}
+
+void showCubeFaces(Cube cube)
+{
+    printf("=== CUBE ===\n");
+    showFrontFace(cube);
+    printf("\n");
+    showLeftFace(cube);
+    printf("\n");
+    showRightFace(cube);
+    printf("\n");
+    showBackFace(cube);
+    printf("\n");
+    showTopFace(cube);
+    printf("\n");
+    showBottomFace(cube);
+    printf("============\n\n");
+    return;
+}
+
 void showRow(int row, int face[][DI])
 {
     for (int i = 0; i < DI; i++)
@@ -51,42 +122,42 @@ void showRow(int row, int face[][DI])
         printf("%c", COLORS[face[row][i]]);
     }
     printf(" ");
-    return;
+  return;
 }
 
 void showBlankRow()
 {
-    printf("    ");
-    return;
+  printf("    ");
+  return;
 }
 
-void showCube(int cube[FACES][DI][DI])
+void showCube(Cube cube)
 {
     printf("=== CUBE ===\n");
     // Parte superior
     for (int i = 0; i < DI; i++)
     {
         showBlankRow();
-        showRow(i, cube[TOP]);
+        showRow(i, cube.topFace);
         printf("\n");
     }
     // Parte do meio
     for (int i = 0; i < DI; i++)
     {
-        showRow(i, cube[LEFT]);
-        showRow(i, cube[FRONT]);
-        showRow(i, cube[RIGHT]);
-        showRow(i, cube[BACK]);
+        showRow(i, cube.leftFace);
+        showRow(i, cube.frontFace);
+        showRow(i, cube.rightFace);
+        showRow(i, cube.backFace);
         printf("\n");
     }
     // Parte inferior
     for (int i = 0; i < DI; i++)
     {
         showBlankRow();
-        showRow(i, cube[BOTTOM]);
+        showRow(i, cube.bottomFace);
         printf("\n");
     }
-    // printf("============\n\n");
+    printf("============\n\n");
     return;
 }
 
@@ -97,7 +168,7 @@ int rotateFaceClockwise(int face[][DI])
     {
         for (int c = 0; c < DI; c++)
         {
-            int tc = DI - 1 - c;
+            int tc = DI - c;
             int tr = r;
             newFace[tr][tc] = face[r][c];
         }
@@ -139,82 +210,36 @@ void slideRowRightHanded(int row, int face1[][DI], int face2[][DI], int face3[][
 
 void slideRowLeftHanded(int row, int face1[][DI], int face2[][DI], int face3[][DI], int face4[][DI])
 {
-    int auxFaceRow[DI];
-    for (int c = 0; c < DI; c++)
-    {
-        auxFaceRow[c] = face1[row][c];
-    }
-    for (int c = 0; c < DI; c++)
-    {
-        face1[row][c] = face2[row][c];
-        face2[row][c] = face3[row][c];
-        face3[row][c] = face4[row][c];
-    }
-    for (int c = 0; c < DI; c++)
-    {
-        face4[row][c] = auxFaceRow[c];
-    }
     return;
 }
 
-// Interpreta o comando
-void doMove(char move, int cube[FACES][DI][DI])
+void moveA(Cube *cube)
 {
-    switch (move)
-    {
-    case 'U':
-        slideRowRightHanded(0, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
-        rotateFaceClockwise(cube[TOP]);
-        break;
-    case 'u':
-        slideRowLeftHanded(0, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
-        rotateFaceCounterClockwise(cube[TOP]);
-        break;
-    case 'D':
-        slideRowLeftHanded(2, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
-        break;
-    case 'd':
-        slideRowRightHanded(2, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
-        break;
-    default:
-        break;
-    }
+    rotateFaceCounterClockwise(cube->topFace);
+    slideRowRightHanded(0, cube->frontFace, 
+    cube->leftFace, cube->backFace, cube->rightFace);
+    return;
 }
 
 int main()
 {
-    int cube[FACES][DI][DI];
-    char move;
+    Cube cube1;
 
     // Inicializa o cubo com as cores em ordem
-    setFace(cube[FRONT], GREEN);
-    setFace(cube[LEFT], ORANGE);
-    setFace(cube[RIGHT], RED);
-    setFace(cube[BACK], BLUE);
-    setFace(cube[TOP], WHITE);
-    setFace(cube[BOTTOM], YELLOW);
-
-    // Para testes
-    cube[TOP][0][0] = YELLOW;
-    cube[TOP][0][2] = BLUE;
+    setFace(cube1.frontFace, GREEN);
+    setFace(cube1.leftFace, ORANGE);
+    setFace(cube1.rightFace, RED);
+    setFace(cube1.backFace, BLUE);
+    setFace(cube1.topFace, WHITE);
+    setFace(cube1.bottomFace, YELLOW);
     
-    // Repetição do jogo
-    do
-    {
-        showCube(cube);
-        printf("Move: ");
-        move = getchar();
-        if (move == '0')
-        {
-            break;
-        }
-        doMove(move, cube);
-        printf("\n");
-        // Limpa os demais caracteres digitados no comando
-        while ((move = getchar()) != '\n' && move != EOF)
-        {
-        }
-    } while (1);
+    showCube(cube1);
+
+    moveA(&cube1);
+
+    showCube(cube1);
+
 
     return 0;
 }
+*/

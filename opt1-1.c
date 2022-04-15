@@ -1,3 +1,4 @@
+/*
 #include <stdio.h>
 #define DI 3 // dimension of the cube
 #define FACES 6
@@ -157,7 +158,6 @@ void slideRowLeftHanded(int row, int face1[][DI], int face2[][DI], int face3[][D
     return;
 }
 
-// Interpreta o comando
 void doMove(char move, int cube[FACES][DI][DI])
 {
     switch (move)
@@ -168,7 +168,6 @@ void doMove(char move, int cube[FACES][DI][DI])
         break;
     case 'u':
         slideRowLeftHanded(0, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
-        rotateFaceCounterClockwise(cube[TOP]);
         break;
     case 'D':
         slideRowLeftHanded(2, cube[FRONT], cube[LEFT], cube[BACK], cube[RIGHT]);
@@ -194,10 +193,8 @@ int main()
     setFace(cube[TOP], WHITE);
     setFace(cube[BOTTOM], YELLOW);
 
-    // Para testes
     cube[TOP][0][0] = YELLOW;
-    cube[TOP][0][2] = BLUE;
-    
+
     // Repetição do jogo
     do
     {
@@ -218,3 +215,4 @@ int main()
 
     return 0;
 }
+*/
